@@ -3,6 +3,7 @@ import 'package:studytrack_mobile/core/utils/date_format.dart';
 
 void main() {
   wibToUtcTests();
+  headerFormatTests();
   test('formatWib: UTC → WIB', () {
     expect(formatWib(DateTime.utc(2026, 7, 2, 3, 0)), 'Kam, 2 Jul 2026 · 10.00');
   });
@@ -36,5 +37,14 @@ void wibToUtcTests() {
       final w = toWib(wibToUtc(DateTime(2026, 7, 2, 23, 45)));
       expect([w.year, w.month, w.day, w.hour, w.minute], [2026, 7, 2, 23, 45]);
     });
+  });
+}
+
+void headerFormatTests() {
+  test('formatWibLong', () {
+    expect(formatWibLong(DateTime.utc(2026, 7, 2, 2, 0)), 'Kamis, 2 Juli 2026 · 09.00 WIB');
+  });
+  test('formatWibShort', () {
+    expect(formatWibShort(DateTime.utc(2026, 7, 2, 3, 0)), 'Kam, 2 Jul · 10.00');
   });
 }
