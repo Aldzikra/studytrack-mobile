@@ -29,3 +29,24 @@ String deadlineLabel(DateTime deadline, [DateTime? now]) {
 DateTime wibToUtc(DateTime wall) =>
     DateTime.utc(wall.year, wall.month, wall.day, wall.hour, wall.minute)
         .subtract(const Duration(hours: 7));
+
+const _hariPanjang = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const _bulanPanjang = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+];
+
+String _hm(DateTime w) =>
+    '${w.hour.toString().padLeft(2, '0')}.${w.minute.toString().padLeft(2, '0')}';
+
+/// Contoh: "Kamis, 2 Juli 2026 · 09.00 WIB" (header daftar tugas).
+String formatWibLong(DateTime t) {
+  final w = toWib(t);
+  return '${_hariPanjang[w.weekday - 1]}, ${w.day} ${_bulanPanjang[w.month - 1]} ${w.year} · ${_hm(w)} WIB';
+}
+
+/// Contoh: "Kam, 2 Jul · 10.00" (tanggal di TaskCard).
+String formatWibShort(DateTime t) {
+  final w = toWib(t);
+  return '${_hari[w.weekday - 1]}, ${w.day} ${_bulan[w.month - 1]} · ${_hm(w)}';
+}

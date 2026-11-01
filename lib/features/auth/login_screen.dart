@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api/api_error.dart';
 import 'auth_controller.dart';
+import '../../shared/motion/motion.dart';
+import '../../shared/widgets/labeled_field.dart';
 import 'auth_layout.dart';
 import 'validators.dart';
 
@@ -48,43 +50,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return AuthLayout(
       title: 'Masuk',
-      subtitle: 'Lanjutkan memantau tugas kuliahmu.',
+      subtitle: 'Masuk dengan email dan password akunmu.',
       child: Form(
         key: _form,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+            LabeledField(
+              label: 'Email',
+              hint: 'nama@kampus.ac.id',
               controller: _email,
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
-              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
               validator: validateEmail,
             ),
-            const SizedBox(height: 16),
-            TextFormField(
+            const SizedBox(height: 18),
+            LabeledField(
+              label: 'Password',
+              hint: 'Minimal 8 karakter',
               controller: _password,
               obscureText: true,
               autofillHints: const [AutofillHints.password],
-              decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
               validator: validatePassword,
-              onFieldSubmitted: (_) => _submit(),
+              onSubmitted: (_) => _submit(),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
             ],
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _loading ? null : _submit,
-              child: _loading
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Masuk'),
+            PressScale(
+              child: FilledButton(
+                onPressed: _loading ? null : _submit,
+                child: _loading
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('Masuk'),
+              ),
             ),
-            TextButton(
-              onPressed: () => context.go('/register'),
-              child: const Text('Belum punya akun? Daftar'),
-            ),
+            const SizedBox(height: 4),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Belum punya akun?', style: const TextStyle(fontSize: 14, color: Color(0xFF55627A))),
+              TextButton(
+                style: TextButton.styleFrom(minimumSize: const Size(44, 44), padding: const EdgeInsets.symmetric(horizontal: 4)),
+                onPressed: () => context.go('/register'),
+                child: const Text('Daftar', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ]),
           ],
         ),
       ),

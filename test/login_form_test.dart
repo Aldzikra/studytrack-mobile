@@ -10,6 +10,7 @@ Future<void> _pump(WidgetTester t) => t.pumpWidget(
 void main() {
   testWidgets('form kosong menampilkan error', (t) async {
     await _pump(t);
+    await t.ensureVisible(find.widgetWithText(FilledButton, 'Masuk'));
     await t.tap(find.widgetWithText(FilledButton, 'Masuk'));
     await t.pump();
     expect(find.text('Email wajib diisi'), findsOneWidget);
@@ -20,6 +21,7 @@ void main() {
     await _pump(t);
     await t.enterText(find.byType(TextFormField).first, 'bukan-email');
     await t.enterText(find.byType(TextFormField).last, '1234567');
+    await t.ensureVisible(find.widgetWithText(FilledButton, 'Masuk'));
     await t.tap(find.widgetWithText(FilledButton, 'Masuk'));
     await t.pump();
     expect(find.text('Format email tidak valid'), findsOneWidget);
