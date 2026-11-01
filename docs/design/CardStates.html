@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Status Card Tugas</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1A5FD6}a:hover{color:#123F8F}
+</style>
+</helmet>
+<div style="width: 1040px; height: 640px; box-sizing: border-box; padding: 44px 48px; background: #F4F7FD; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1B33; display: flex; flex-direction: column; gap: 28px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em;">Tiga kondisi card tugas</h1>
+    <p style="margin: 0; font-size: 15px; color: #55627A;">Card membaca <strong style="color: #0F1B33;">deadline_category</strong> dari API. Contoh: sekarang = Kam, 2 Jul 2026 · 09.00.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; flex-grow: 1;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 13px; font-weight: 800; color: #3B4863; text-transform: uppercase; letter-spacing: 0.06em;">Normal</span>
+      <article style="background: #FFFFFF; border: 1px solid #DCE5F5; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 8px;">
+          <span style="padding: 4px 10px; border-radius: 999px; background: #F2F7A0; color: #4D4A00; font-size: 12px; font-weight: 700;">Belum</span>
+        </div>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700;">Sprint 2: Backend API Integration</h2>
+        <span style="font-size: 13px; color: #55627A;">CS 169 · Software Engineering</span>
+        <span style="font-size: 13px; font-weight: 600; color: #3B4863;">Sen, 6 Jul 2026 · 23.59</span>
+      </article>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #DCE5F5; font-size: 13px; line-height: 1.5; color: #3B4863;">
+        <strong style="color: #0F1B33;">Kapan:</strong>
+        <span>sisa waktu ≥ 24 jam, atau status sudah <em>selesai</em>.</span>
+        <span>Tampilan lama; badge Belum (kuning) / Selesai (hijau).</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 13px; font-weight: 800; color: #9A3A00; text-transform: uppercase; letter-spacing: 0.06em;">Mendekati deadline</span>
+      <article style="background: #FFFFFF; border: 2px solid #E2580B; border-radius: 16px; padding: 19px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 18px rgba(226, 88, 11, 0.12);">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #E2580B; color: #FFFFFF; font-size: 12px; font-weight: 700;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2 2"></path><path d="M5 3L2 6M19 3l3 3"></path></svg>
+            Sisa 1 jam
+          </span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #F2F7A0; color: #4D4A00; font-size: 12px; font-weight: 700;">Belum</span>
+        </div>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700;">Project 3: BSTMap Implementation</h2>
+        <span style="font-size: 13px; color: #55627A;">CS 61B · Data Structures</span>
+        <span style="font-size: 13px; font-weight: 700; color: #9A3A00;">Kam, 2 Jul 2026 · 10.00</span>
+      </article>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 12px; background: #FFF1E6; border: 1px solid #F7C9A6; font-size: 13px; line-height: 1.5; color: #7A2E00;">
+        <strong style="color: #5C2300;">Kapan:</strong>
+        <span>status <em>belum</em> dan 0 &lt; deadline − sekarang &lt; 24 jam.</span>
+        <span>Border oranye, badge sisa waktu, tampil paling atas.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 13px; font-weight: 800; color: #2E3546; text-transform: uppercase; letter-spacing: 0.06em;">Terlambat (overdue)</span>
+      <article style="background: #F7F8FA; border: 1px dashed #8D96A8; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #3A4256; color: #FFFFFF; font-size: 12px; font-weight: 700;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5M12 16h.01"></path></svg>
+            Terlambat 9 jam
+          </span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #F2F7A0; color: #4D4A00; font-size: 12px; font-weight: 700;">Belum</span>
+        </div>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #2E3546;">Homework 2: SQL Basics</h2>
+        <span style="font-size: 13px; color: #55627A;">CS 186 · Database Systems</span>
+        <span style="font-size: 13px; font-weight: 700; color: #3A4256; text-decoration: line-through;">Rab, 1 Jul 2026 · 23.59</span>
+      </article>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 12px; background: #ECEFF4; border: 1px solid #CDD3DE; font-size: 13px; line-height: 1.5; color: #2E3546;">
+        <strong style="color: #0F1B33;">Kapan:</strong>
+        <span>status <em>belum</em> dan deadline ≤ sekarang.</span>
+        <span>Latar abu, garis putus-putus, tanggal dicoret; tetap tampil.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1040,"height":640}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
