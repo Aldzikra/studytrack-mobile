@@ -6,9 +6,8 @@ import '../../app/theme.dart';
 import '../../core/api/api_error.dart';
 import '../../core/utils/date_format.dart';
 import '../../shared/motion/motion.dart';
-import '../../shared/widgets/app_logo.dart';
+import '../../shared/widgets/app_header.dart';
 import '../../shared/widgets/message_view.dart';
-import '../auth/auth_controller.dart';
 import 'tugas.dart';
 import 'tugas_repository.dart';
 import 'widgets/stat_card.dart';
@@ -22,7 +21,7 @@ class TugasPage extends ConsumerWidget {
     final list = ref.watch(tugasListProvider);
     return Scaffold(
       body: Column(children: [
-        const _Header(),
+        const AppHeader(),
         Expanded(
           child: Stack(children: [
             list.when(
@@ -44,34 +43,6 @@ class TugasPage extends ConsumerWidget {
             ),
             const Positioned(right: 20, bottom: 20, child: Pop(child: _Fab())),
           ]),
-        ),
-      ]),
-    );
-  }
-}
-
-class _Header extends ConsumerWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final name = ref.watch(authControllerProvider).value?.username ?? '';
-    final initials = name.isEmpty ? '?' : name.trim().substring(0, name.trim().length < 2 ? 1 : 2).toUpperCase();
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 16 + MediaQuery.paddingOf(context).top, 20, 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
-      ),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        const AppLogo(),
-        Container(
-          width: 36,
-          height: 36,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.cyan),
-          child: Text(initials,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0B3A4A))),
         ),
       ]),
     );

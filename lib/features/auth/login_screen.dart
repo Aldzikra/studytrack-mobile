@@ -37,7 +37,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _error = null;
     });
     try {
-      await ref.read(authControllerProvider.notifier).login(_email.text.trim(), _password.text);
+      await ref
+          .read(authControllerProvider.notifier)
+          .login(_email.text.trim(), _password.text);
       // router redirect membawa ke /tugas
     } catch (e) {
       if (mounted) setState(() => _error = parseApiError(e));
@@ -67,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: 18),
             LabeledField(
               label: 'Password',
-              hint: 'Minimal 8 karakter',
+              hint: '******',
               controller: _password,
               obscureText: true,
               autofillHints: const [AutofillHints.password],
@@ -76,26 +78,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),
-              Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ],
             const SizedBox(height: 24),
             PressScale(
               child: FilledButton(
                 onPressed: _loading ? null : _submit,
                 child: _loading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Text('Masuk'),
               ),
             ),
             const SizedBox(height: 4),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('Belum punya akun?', style: const TextStyle(fontSize: 14, color: Color(0xFF55627A))),
-              TextButton(
-                style: TextButton.styleFrom(minimumSize: const Size(44, 44), padding: const EdgeInsets.symmetric(horizontal: 4)),
-                onPressed: () => context.go('/register'),
-                child: const Text('Daftar', style: TextStyle(fontWeight: FontWeight.w700)),
-              ),
-            ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Belum punya akun?',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF55627A),
+                  ),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(44, 44),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                  onPressed: () => context.go('/register'),
+                  child: const Text(
+                    'Daftar',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

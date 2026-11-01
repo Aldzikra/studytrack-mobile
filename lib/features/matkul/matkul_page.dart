@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
+import '../../shared/widgets/app_header.dart';
 import '../../core/api/api_error.dart';
 import '../../shared/widgets/message_view.dart';
 import 'matkul.dart';
@@ -15,7 +16,10 @@ class MatkulPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final list = ref.watch(matkulListProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Mata Kuliah')),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(61 + MediaQuery.paddingOf(context).top),
+        child: const AppHeader(),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showModalBottomSheet(
           context: context,
