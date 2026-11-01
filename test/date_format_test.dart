@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:studytrack_mobile/core/utils/date_format.dart';
 
 void main() {
+  wibToUtcTests();
   test('formatWib: UTC → WIB', () {
     expect(formatWib(DateTime.utc(2026, 7, 2, 3, 0)), 'Kam, 2 Jul 2026 · 10.00');
   });
@@ -17,5 +18,23 @@ void main() {
   });
   test('kurang dari 1 jam', () {
     expect(deadlineLabel(now.add(const Duration(minutes: 20)), now), 'Sisa <1 jam');
+  });
+}
+
+void wibToUtcTests() {
+  group('wibToUtc', () {
+    test('10.00 WIB → 03:00Z', () {
+      expect(wibToUtc(DateTime(2026, 7, 2, 10, 0)), DateTime.utc(2026, 7, 2, 3, 0));
+    });
+    test('lintas hari: 03.00 WIB 1 Jan → 20:00Z 31 Des', () {
+      expect(wibToUtc(DateTime(2026, 1, 1, 3, 0)), DateTime.utc(2025, 12, 31, 20, 0));
+    });
+    test('RFC3339 berakhiran Z', () {
+      expect(wibToUtc(DateTime(2026, 7, 2, 10, 0)).toIso8601String(), '2026-07-02T03:00:00.000Z');
+    });
+    test('bolak-balik dengan toWib', () {
+      final w = toWib(wibToUtc(DateTime(2026, 7, 2, 23, 45)));
+      expect([w.year, w.month, w.day, w.hour, w.minute], [2026, 7, 2, 23, 45]);
+    });
   });
 }
