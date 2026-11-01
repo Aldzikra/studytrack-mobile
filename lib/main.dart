@@ -6,13 +6,13 @@ import 'app/theme.dart';
 
 void main() => runApp(const ProviderScope(child: App()));
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
+  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
         title: 'StudyTrack',
         theme: buildTheme(),
-        routerConfig: router,
+        routerConfig: ref.watch(routerProvider),
       );
 }
