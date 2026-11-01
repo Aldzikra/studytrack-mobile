@@ -4,7 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/api_error.dart';
+import '../../core/utils/date_format.dart';
+import '../../shared/motion/motion.dart';
+import '../../shared/widgets/app_logo.dart';
 import '../../shared/widgets/message_view.dart';
+import '../auth/auth_controller.dart';
 import 'tugas.dart';
 import 'tugas_repository.dart';
 import 'widgets/stat_card.dart';
@@ -17,32 +21,91 @@ class TugasPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final list = ref.watch(tugasListProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Tugas')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/tugas/form'),
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah Tugas'),
-      ),
-      body: list.when(
-        // skipLoadingOnRefresh (default) menjaga daftar tetap tampil saat refresh.
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => MessageView(
-          icon: Icons.cloud_off,
-          text: parseApiError(e),
-          action: FilledButton(
-            onPressed: () => ref.invalidate(tugasListProvider),
-            child: const Text('Coba lagi'),
-          ),
+      body: Column(children: [
+        const _Header(),
+        Expanded(
+          child: Stack(children: [
+            list.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => MessageView(
+                icon: Icons.cloud_off,
+                text: parseApiError(e),
+                action: FilledButton(
+                  onPressed: () => ref.invalidate(tugasListProvider),
+                  child: const Text('Coba lagi'),
+                ),
+              ),
+              data: (items) => RefreshIndicator(
+                onRefresh: () => ref.refresh(tugasListProvider.future),
+                child: items.isEmpty
+                    ? const MessageView(icon: Icons.inbox_outlined, text: 'Belum ada tugas.')
+                    : _TugasList(items),
+              ),
+            ),
+            const Positioned(right: 20, bottom: 20, child: Pop(child: _Fab())),
+          ]),
         ),
-        data: (items) => RefreshIndicator(
-          onRefresh: () => ref.refresh(tugasListProvider.future),
-          child: items.isEmpty
-              ? const MessageView(icon: Icons.inbox_outlined, text: 'Belum ada tugas.')
-              : _TugasList(items),
-        ),
-      ),
+      ]),
     );
   }
+}
+
+class _Header extends ConsumerWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final name = ref.watch(authControllerProvider).value?.username ?? '';
+    final initials = name.isEmpty ? '?' : name.trim().substring(0, name.trim().length < 2 ? 1 : 2).toUpperCase();
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 16 + MediaQuery.paddingOf(context).top, 20, 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        const AppLogo(),
+        Container(
+          width: 36,
+          height: 36,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.cyan),
+          child: Text(initials,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0B3A4A))),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Kotak 56, radius 18 (sama dengan FAB web).
+class _Fab extends StatelessWidget {
+  const _Fab();
+
+  @override
+  Widget build(BuildContext context) => PressScale(
+        child: Semantics(
+          button: true,
+          label: 'Tambah tugas',
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: const [BoxShadow(color: Color(0x591A5FD6), blurRadius: 20, offset: Offset(0, 8))],
+            ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: () => context.push('/tugas/form'),
+                child: const Icon(Icons.add, size: 24, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 class _TugasList extends StatelessWidget {
@@ -55,33 +118,76 @@ class _TugasList extends StatelessWidget {
     List<Tugas> by(DeadlineCategory c) => items.where((t) => t.category == c).toList();
     final mendekati = by(DeadlineCategory.mendekati);
     final overdue = by(DeadlineCategory.overdue);
-    final lainnya = items.where((t) =>
-        t.category != DeadlineCategory.mendekati && t.category != DeadlineCategory.overdue).toList();
+    final lainnya = items
+        .where((t) => t.category != DeadlineCategory.mendekati && t.category != DeadlineCategory.overdue)
+        .toList();
 
-    Iterable<Widget> section(String title, List<Tugas> l) => l.isEmpty
+    List<Widget> section(String title, Color color, List<Tugas> l) => l.isEmpty
         ? const []
         : [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 8),
-              child: Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-            ),
-            for (final t in l) Padding(padding: const EdgeInsets.only(bottom: 12), child: TaskCard(tugas: t)),
+            const SizedBox(height: 20),
+            Text(title.toUpperCase(),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.72, color: color)),
+            const SizedBox(height: 10),
+            for (var i = 0; i < l.length; i++)
+              Padding(
+                padding: EdgeInsets.only(bottom: i == l.length - 1 ? 0 : 10),
+                child: FadeUp.item(key: ValueKey(l[i].id), index: i, child: TaskCard(tugas: l[i])),
+              ),
           ];
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      // bawah: FAB 56 + jarak 20 + 20 agar card terakhir tidak tertutup.
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 96),
       children: [
+        FadeUp(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(formatWibLong(DateTime.now()),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted)),
+            const SizedBox(height: 4),
+            const Text('Daftar Tugas',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+          ]),
+        ),
+        const SizedBox(height: 20),
         Row(children: [
-          Expanded(child: StatCard(label: 'Mendekati', count: mendekati.length, color: AppColors.mendekati)),
+          Expanded(
+            child: StatCard(
+              label: 'Mendekati',
+              count: mendekati.length,
+              background: AppColors.mendekatiBg,
+              border: AppColors.mendekatiBorder,
+              numberColor: AppColors.mendekatiFg,
+              labelColor: const Color(0xFF7A2E00),
+            ),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: StatCard(label: 'Terlambat', count: overdue.length, color: AppColors.overdueBadge)),
+          Expanded(
+            child: StatCard(
+              label: 'Terlambat',
+              count: overdue.length,
+              background: AppColors.overdueChipBg,
+              border: AppColors.overdueChipBorder,
+              numberColor: AppColors.overdueFg,
+              labelColor: AppColors.overdueFg,
+            ),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: StatCard(label: 'Lainnya', count: lainnya.length, color: AppColors.primary)),
+          Expanded(
+            child: StatCard(
+              label: 'Lainnya',
+              count: lainnya.length,
+              background: Colors.white,
+              border: AppColors.border,
+              numberColor: AppColors.primary,
+              labelColor: AppColors.text2,
+            ),
+          ),
         ]),
-        ...section('Mendekati', mendekati),
-        ...section('Terlambat', overdue),
-        ...section('Lainnya', lainnya),
+        ...section('Mendekati deadline', AppColors.mendekatiFg, mendekati),
+        ...section('Terlambat', AppColors.overdueFg, overdue),
+        ...section('Tugas lainnya', AppColors.text2, lainnya),
       ],
     );
   }

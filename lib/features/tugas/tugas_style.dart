@@ -23,6 +23,12 @@ class TugasCardStyle {
     this.dashed = false,
     this.badgeColor,
     this.strikeDate = false,
+    this.shadow = const [],
+    this.titleColor = AppColors.ink,
+    this.dateColor = AppColors.text2,
+    this.dateWeight = FontWeight.w600,
+    this.buttonBorder = AppColors.border,
+    this.buttonColor = AppColors.primary,
   });
 
   final Color background;
@@ -33,16 +39,33 @@ class TugasCardStyle {
   /// Warna badge "Sisa/Terlambat X jam"; null = tanpa badge.
   final Color? badgeColor;
   final bool strikeDate;
+  final List<BoxShadow> shadow;
+  final Color titleColor;
+  final Color dateColor;
+  final FontWeight dateWeight;
+  final Color buttonBorder;
+  final Color buttonColor;
 }
 
+// Nilai dari docs/design/MobileTugas.html & CardStates.html.
 TugasCardStyle styleFor(TugasCardKind k) => switch (k) {
-      TugasCardKind.normal || TugasCardKind.selesai =>
+      TugasCardKind.normal =>
         const TugasCardStyle(background: Colors.white, borderColor: AppColors.border),
+      TugasCardKind.selesai => const TugasCardStyle(
+          background: Colors.white,
+          borderColor: AppColors.border,
+          titleColor: AppColors.muted,
+          dateColor: AppColors.muted,
+          buttonColor: AppColors.muted,
+        ),
       TugasCardKind.mendekati => const TugasCardStyle(
           background: Colors.white,
           borderColor: AppColors.mendekati,
           borderWidth: 2,
           badgeColor: AppColors.mendekati,
+          dateColor: AppColors.mendekatiFg,
+          dateWeight: FontWeight.w700,
+          shadow: [BoxShadow(color: Color(0x1FE2580B), blurRadius: 18, offset: Offset(0, 6))],
         ),
       TugasCardKind.overdue => const TugasCardStyle(
           background: AppColors.overdueBg,
@@ -50,5 +73,9 @@ TugasCardStyle styleFor(TugasCardKind k) => switch (k) {
           dashed: true,
           badgeColor: AppColors.overdueBadge,
           strikeDate: true,
+          titleColor: AppColors.overdueFg,
+          dateColor: AppColors.overdueBadge,
+          dateWeight: FontWeight.w700,
+          buttonBorder: AppColors.overdueChipBorder,
         ),
     };

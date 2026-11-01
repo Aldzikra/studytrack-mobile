@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme.dart';
 import '../../../core/api/api_error.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../shared/motion/motion.dart';
 import '../tugas.dart';
 import '../tugas_repository.dart';
 import '../tugas_style.dart';
@@ -40,70 +41,71 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   Widget build(BuildContext context) {
     final t = widget.tugas;
     final s = styleFor(cardKind(t));
-    final tt = Theme.of(context).textTheme;
     final radius = BorderRadius.circular(16);
 
     final content = Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Expanded(
-              child: Text(t.matkulNama,
-                  style: tt.labelMedium?.copyWith(color: AppColors.muted), overflow: TextOverflow.ellipsis),
-            ),
+      // total 16 termasuk border (desain: padding 15 + border 2px).
+      padding: EdgeInsets.all(16 - (s.dashed ? 1 : s.borderWidth)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          if (s.badgeColor != null)
             _Badge(
-              t.selesai ? 'Selesai' : 'Belum',
-              t.selesai ? AppColors.selesaiBg : AppColors.belumBg,
-              t.selesai ? AppColors.selesaiFg : AppColors.belumFg,
+              deadlineLabel(t.deadline),
+              s.badgeColor!,
+              Colors.white,
+              icon: cardKind(t) == TugasCardKind.mendekati ? Icons.alarm : Icons.error_outline,
             ),
-          ]),
-          const SizedBox(height: 6),
-          Text(t.judul, style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-          if (t.deskripsi.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(t.deskripsi,
-                maxLines: 2, overflow: TextOverflow.ellipsis, style: tt.bodySmall?.copyWith(color: AppColors.muted)),
-          ],
-          const SizedBox(height: 10),
-          Row(children: [
-            const Icon(Icons.event, size: 16, color: AppColors.muted),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                formatWib(t.deadline),
-                style: tt.bodySmall?.copyWith(
-                  color: AppColors.muted,
-                  decoration: s.strikeDate ? TextDecoration.lineThrough : null,
-                ),
+          if (t.selesai)
+            const _Badge('Selesai', AppColors.selesaiBg, AppColors.selesaiFg, icon: Icons.check)
+          else
+            const _Badge('Belum', AppColors.belumBg, AppColors.belumFg),
+        ]),
+        const SizedBox(height: 8),
+        Text(t.judul, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: s.titleColor)),
+        const SizedBox(height: 8),
+        Text(t.matkulNama, style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: Text(
+              formatWibShort(t.deadline),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: s.dateWeight,
+                color: s.dateColor,
+                decoration: s.strikeDate ? TextDecoration.lineThrough : null,
               ),
             ),
-            if (s.badgeColor != null) _Badge(deadlineLabel(t.deadline), s.badgeColor!, Colors.white),
-          ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-              child: SizedBox(
-                height: 44,
-                child: t.selesai
-                    ? OutlinedButton(onPressed: _busy ? null : _toggle, child: _label('Batalkan'))
-                    : FilledButton(onPressed: _busy ? null : _toggle, child: _label('Tandai selesai')),
-              ),
+          ),
+          PressScale(
+            child: IconButton(
+              tooltip: 'Ubah ${t.judul}',
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              onPressed: () => context.push('/tugas/form', extra: t),
+              icon: const Icon(Icons.edit_outlined, size: 20, color: AppColors.muted),
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 44,
-              height: 44,
-              child: IconButton.outlined(
-                tooltip: 'Edit',
-                onPressed: () => context.push('/tugas/form', extra: t),
-                icon: const Icon(Icons.edit_outlined),
+          ),
+          const SizedBox(width: 4),
+          PressScale(
+            child: OutlinedButton(
+              onPressed: _busy ? null : _toggle,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(44, 44),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                foregroundColor: s.buttonColor,
+                backgroundColor: Colors.white,
+                side: BorderSide(color: s.buttonBorder),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
               ),
+              child: _busy
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Text(t.selesai ? 'Batalkan' : 'Tandai selesai'),
             ),
-          ]),
-        ],
-      ),
+          ),
+        ]),
+      ]),
     );
 
     return CustomPaint(
@@ -112,30 +114,30 @@ class _TaskCardState extends ConsumerState<TaskCard> {
         decoration: BoxDecoration(
           color: s.background,
           borderRadius: radius,
-          border: s.dashed ? null : Border.all(color: s.borderColor, width: s.borderWidth),
+          boxShadow: s.shadow,
+          border: s.dashed ? Border.all(color: Colors.transparent) : Border.all(color: s.borderColor, width: s.borderWidth),
         ),
         child: content,
       ),
     );
   }
-
-  Widget _label(String text) => _busy
-      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-      : Text(text);
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge(this.text, this.bg, this.fg);
+  const _Badge(this.text, this.bg, this.fg, {this.icon});
   final String text;
   final Color bg;
   final Color fg;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-        child: Text(text,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg, fontWeight: FontWeight.w700)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[Icon(icon, size: 13, color: fg), const SizedBox(width: 5)],
+          Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: fg)),
+        ]),
       );
 }
 
@@ -146,14 +148,15 @@ class _DashedBorder extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path()..addRRect(radius.toRRect(Offset.zero & size));
+    // inset 0.5 agar garis 1px tepat di tepi kotak.
+    final path = Path()..addRRect(radius.toRRect(Offset.zero & size).deflate(0.5));
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1;
     for (final m in path.computeMetrics()) {
-      for (var d = 0.0; d < m.length; d += 10) {
-        canvas.drawPath(m.extractPath(d, d + 6), paint);
+      for (var d = 0.0; d < m.length; d += 7) {
+        canvas.drawPath(m.extractPath(d, d + 4), paint);
       }
     }
   }
