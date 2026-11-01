@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
 import '../../../core/api/api_error.dart';
@@ -81,13 +82,26 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             if (s.badgeColor != null) _Badge(deadlineLabel(t.deadline), s.badgeColor!, Colors.white),
           ]),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 44,
-            child: t.selesai
-                ? OutlinedButton(onPressed: _busy ? null : _toggle, child: _label('Batalkan'))
-                : FilledButton(onPressed: _busy ? null : _toggle, child: _label('Tandai selesai')),
-          ),
+          Row(children: [
+            Expanded(
+              child: SizedBox(
+                height: 44,
+                child: t.selesai
+                    ? OutlinedButton(onPressed: _busy ? null : _toggle, child: _label('Batalkan'))
+                    : FilledButton(onPressed: _busy ? null : _toggle, child: _label('Tandai selesai')),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: IconButton.outlined(
+                tooltip: 'Edit',
+                onPressed: () => context.push('/tugas/form', extra: t),
+                icon: const Icon(Icons.edit_outlined),
+              ),
+            ),
+          ]),
         ],
       ),
     );

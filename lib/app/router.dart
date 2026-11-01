@@ -6,6 +6,8 @@ import '../features/auth/auth_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/matkul/matkul_page.dart';
+import '../features/tugas/tugas.dart';
+import '../features/tugas/tugas_form_screen.dart';
 import '../features/tugas/tugas_page.dart';
 import 'app_shell.dart';
 
@@ -33,6 +35,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: '/tugas/form',
+        builder: (_, state) => TugasFormScreen(tugas: state.extra as Tugas?),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => AppShell(shell: shell),
         branches: [

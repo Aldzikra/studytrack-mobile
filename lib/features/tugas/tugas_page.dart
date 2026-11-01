@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/api_error.dart';
+import '../../shared/widgets/message_view.dart';
 import 'tugas.dart';
 import 'tugas_repository.dart';
 import 'widgets/stat_card.dart';
@@ -16,10 +18,15 @@ class TugasPage extends ConsumerWidget {
     final list = ref.watch(tugasListProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Tugas')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/tugas/form'),
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah Tugas'),
+      ),
       body: list.when(
         // skipLoadingOnRefresh (default) menjaga daftar tetap tampil saat refresh.
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _Message(
+        error: (e, _) => MessageView(
           icon: Icons.cloud_off,
           text: parseApiError(e),
           action: FilledButton(
@@ -30,7 +37,7 @@ class TugasPage extends ConsumerWidget {
         data: (items) => RefreshIndicator(
           onRefresh: () => ref.refresh(tugasListProvider.future),
           child: items.isEmpty
-              ? const _Message(icon: Icons.inbox_outlined, text: 'Belum ada tugas.')
+              ? const MessageView(icon: Icons.inbox_outlined, text: 'Belum ada tugas.')
               : _TugasList(items),
         ),
       ),
@@ -78,32 +85,4 @@ class _TugasList extends StatelessWidget {
       ],
     );
   }
-}
-
-class _Message extends StatelessWidget {
-  const _Message({required this.icon, required this.text, this.action});
-  final IconData icon;
-  final String text;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-        builder: (_, c) => SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: SizedBox(
-            height: c.maxHeight,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(icon, size: 48, color: AppColors.muted),
-                  const SizedBox(height: 12),
-                  Text(text, textAlign: TextAlign.center),
-                  if (action != null) ...[const SizedBox(height: 16), action!],
-                ]),
-              ),
-            ),
-          ),
-        ),
-      );
 }
