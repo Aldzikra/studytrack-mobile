@@ -23,3 +23,9 @@ String deadlineLabel(DateTime deadline, [DateTime? now]) {
   final x = jam < 1 ? '<1' : '$jam';
   return diff.isNegative ? 'Terlambat $x jam' : 'Sisa $x jam';
 }
+
+/// Komponen [wall] dibaca sebagai jam dinding WIB (flag UTC/lokal diabaikan);
+/// hasilnya instan UTC untuk dikirim ke API (`toIso8601String()` → RFC3339 'Z').
+DateTime wibToUtc(DateTime wall) =>
+    DateTime.utc(wall.year, wall.month, wall.day, wall.hour, wall.minute)
+        .subtract(const Duration(hours: 7));
