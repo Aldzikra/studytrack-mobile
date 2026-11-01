@@ -17,7 +17,7 @@ class AppLogo extends StatelessWidget {
             color: light ? Colors.white : AppColors.brand,
             borderRadius: BorderRadius.circular(size * 0.29),
           ),
-          child: Icon(Icons.menu_book_rounded, size: size * 0.56, color: light ? AppColors.brand : Colors.white),
+          child: Icon(Icons.check_rounded, size: size * 0.72, color: light ? AppColors.brand : Colors.white),
         ),
         const SizedBox(width: 8),
         Text('StudyTrack',

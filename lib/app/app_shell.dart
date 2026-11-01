@@ -1,29 +1,21 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/auth/auth_controller.dart';
 import 'theme.dart';
 
-class AppShell extends ConsumerWidget {
+class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.shell});
   final StatefulNavigationShell shell;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: shell,
         bottomNavigationBar: _TabBar(
           current: shell.currentIndex,
-          onTap: (i) {
-            // Tab ke-3 bukan halaman: langsung keluar, router redirect ke /login.
-            if (i == 2) {
-              ref.read(authControllerProvider.notifier).logout();
-            } else {
-              shell.goBranch(i, initialLocation: i == shell.currentIndex);
-            }
-          },
+          // Keluar ada di header (AppHeader), bukan di tab bar — sama dengan web.
+          onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
         ),
       );
 }
@@ -37,7 +29,6 @@ class _TabBar extends StatelessWidget {
   static const _items = [
     (Icons.format_list_bulleted, 'Tugas'),
     (Icons.school_outlined, 'Mata Kuliah'),
-    (Icons.logout, 'Keluar'),
   ];
 
   @override
@@ -82,7 +73,7 @@ class _TabItem extends StatelessWidget {
         onTap: onTap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 52),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
               decoration: BoxDecoration(
